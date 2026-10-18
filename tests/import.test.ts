@@ -6,7 +6,7 @@ import { generateDemo } from '../src/data/demo.ts';
 
 describe('CSV', () => {
   it('разделитель ; и кавычки', () => {
-    const rows = parseCsv('﻿a;b;c\r\n1;"x; ""y""";3\n\n4;5;6\n');
+    const rows = parseCsv('\uFEFFa;b;c\r\n1;"x; ""y""";3\n\n4;5;6\n');
     expect(rows).toEqual([
       ['a', 'b', 'c'],
       ['1', 'x; "y"', '3'],

@@ -7,7 +7,7 @@ export function detectDelimiter(text: string): string {
 }
 
 export function parseCsv(input: string, delimiter?: string): string[][] {
-  const text = input.replace(/^﻿/, '');
+  const text = input.replace(/^\uFEFF/, '');
   const d = delimiter ?? detectDelimiter(text);
   const rows: string[][] = [];
   let row: string[] = [];
@@ -48,5 +48,5 @@ function esc(v: unknown, d: string): string {
 
 /** CSV для Excel: разделитель «;», BOM для кириллицы. */
 export function toCsv(rows: unknown[][], d = ';'): string {
-  return '﻿' + rows.map((r) => r.map((v) => esc(v, d)).join(d)).join('\r\n') + '\r\n';
+  return '\uFEFF' + rows.map((r) => r.map((v) => esc(v, d)).join(d)).join('\r\n') + '\r\n';
 }
