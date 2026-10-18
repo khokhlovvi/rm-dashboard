@@ -146,7 +146,7 @@ input {
 /* ——— Шапка ——— */
 .topbar {
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   z-index: 20;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -837,6 +837,44 @@ table.plan td.cell.current {
   padding: 32px;
   text-align: center;
   color: var(--text-3);
+}
+
+/* ——— Узкие экраны (телефон) ——— */
+@media (max-width: 640px) {
+  .topbar-inner,
+  .nav-inner,
+  .page {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .cols-4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .seg {
+    flex-wrap: wrap;
+  }
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .signal {
+    grid-template-columns: 22px minmax(0, 1fr);
+  }
+  .signal .sig-list {
+    grid-column: 1 / -1;
+  }
+  .funnel .stage {
+    grid-template-columns: minmax(0, 1fr) 72px;
+  }
+  .funnel .stage .track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .bar-row {
+    grid-template-columns: minmax(80px, 120px) minmax(0, 1fr) 56px;
+  }
+  .kpi .value {
+    font-size: 1.6rem;
+  }
 }
 
 /* ——— Печать для планёрки ——— */

@@ -7,6 +7,10 @@ import { attentionSignals, type Signal } from '../core/attention.ts';
 import { loadDataset, readJson, writeJson } from '../data/store.ts';
 import { h } from './dom.ts';
 
+/** Сборка для просмотрщика артефактов (`npm run build:artifact`): там нельзя печатать и скачивать файлы. */
+export const EMBEDDED = import.meta.env.MODE === 'artifact';
+const CAN_PRINT = !EMBEDDED;
+
 export interface UiState {
   period: PeriodKind;
   customStart: string;
@@ -82,6 +86,10 @@ export class App {
   private root: HTMLElement;
   private cache = new Map<string, Cube>();
   private scrollKey = '';
+  /** Текущий маршрут: из hash, но хранится и в памяти — на случай, если среда не даёт менять hash (встраивание). */
+  private path = location.hash.replace(/^#\/?/, '');
+  /** data-theme, выставленный внешней средой (например, просмотрщиком артефактов), — для режима «Авто». */
+  private readonly hostTheme = document.documentElement.getAttribute('data-theme');
 
   constructor(root: HTMLElement) {
     this.root = root;
@@ -96,7 +104,17 @@ export class App {
   }
 
   start(): void {
-    window.addEventListener('hashchange', () => this.render());
+    window.addEventListener('hashchange', () => {
+      this.path = location.hash.replace(/^#\/?/, '');
+      this.render();
+    });
+    // Внутренние ссылки «#/...» обрабатываем сами: так навигация работает и там, где hash менять нельзя
+    document.addEventListener('click', (e) => {
+      const a = (e.target as Element | null)?.closest?.('a[href^="#/"]');
+      if (!a || (e as MouseEvent).ctrlKey || (e as MouseEvent).metaKey) return;
+      e.preventDefault();
+      this.go(a.getAttribute('href')!.slice(2));
+    });
     window.addEventListener('beforeprint', () => document.documentElement.setAttribute('data-theme', 'light'));
     window.addEventListener('afterprint', () => this.applyTheme());
     this.applyTheme();
@@ -127,13 +145,19 @@ export class App {
   }
 
   go(path: string): void {
-    location.hash = `#/${path}`;
+    this.path = path;
+    try {
+      history.pushState(null, '', `#/${path}`);
+    } catch {
+      /* среда не разрешает менять адрес — маршрут остаётся в памяти */
+    }
+    this.render();
   }
 
   private applyTheme(): void {
-    const t = this.ui.theme;
-    if (t === 'auto') document.documentElement.removeAttribute('data-theme');
-    else document.documentElement.setAttribute('data-theme', t);
+    const t = this.ui.theme === 'auto' ? this.hostTheme : this.ui.theme;
+    if (t) document.documentElement.setAttribute('data-theme', t);
+    else document.documentElement.removeAttribute('data-theme');
   }
 
   private cube(filters: Filters, departments?: string[]): Cube {
@@ -159,7 +183,7 @@ export class App {
   }
 
   render(): void {
-    const hash = location.hash.replace(/^#\/?/, '');
+    const hash = this.path;
     const route = hash.split('/').map((s) => decodeURIComponent(s));
     const r = this.routes.find((x) => x.path === route[0]) ?? this.routes[0];
     const ctx = this.context(route);
@@ -228,7 +252,7 @@ export class App {
           select('Менеджер', u.manager, managers, (v) => this.setUi({ manager: v }), 'Все'),
           select('Продукт', u.product, ctx.base.products, (v) => this.setUi({ product: v }), 'Все'),
           h('button', { class: 'btn', title: 'Сменить тему', onclick: () => this.setUi({ theme: themeNext[u.theme] }) }, themeLabel[u.theme]),
-          h('button', { class: 'btn', title: 'Печатная версия для планёрки', onclick: () => window.print() }, '⎙ Печать'),
+          CAN_PRINT ? h('button', { class: 'btn', title: 'Печатная версия для планёрки', onclick: () => window.print() }, '⎙ Печать') : null,
         ),
       ),
     );

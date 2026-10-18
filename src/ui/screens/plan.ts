@@ -1,6 +1,6 @@
 import { planSummary, teamPlanStatus, weekPlan, type PlanStatus } from '../../core/metrics.ts';
 import { calendarRange, formatRange, formatShort, getPeriod, lastWeekStarts, monthName, parts, planWeeks, weekKey, addDays, type PlanWeek } from '../../core/periods.ts';
-import { downloadCsv, downloadXlsx, type Cell } from '../../data/export.ts';
+import { CAN_DOWNLOAD, downloadCsv, downloadXlsx, type Cell } from '../../data/export.ts';
 import type { Ctx } from '../app.ts';
 import { h } from '../dom.ts';
 import { fmtPct, STATUS_ICON, STATUS_LABEL, statusEl } from '../format.ts';
@@ -92,8 +92,8 @@ export function planScreen(ctx: Ctx): HTMLElement {
     'div',
     null,
     pageHead(`План ${S} + ${F}`, `${S} стратегические встречи и ${F} фоллоуапов на менеджера в неделю`, [
-      h('button', { class: 'btn', onclick: () => downloadCsv(`план_${ref}`, exportRows()) }, '⤓ CSV'),
-      h('button', { class: 'btn', onclick: () => void downloadXlsx(`план_${ref}`, exportRows(), 'План') }, '⤓ Excel'),
+      CAN_DOWNLOAD ? h('button', { class: 'btn', onclick: () => downloadCsv(`план_${ref}`, exportRows()) }, '⤓ CSV') : null,
+      CAN_DOWNLOAD ? h('button', { class: 'btn', onclick: () => void downloadXlsx(`план_${ref}`, exportRows(), 'План') }, '⤓ Excel') : null,
     ]),
     card('Прошлая неделя', lastWeek ? formatRange(lastWeek) : null, [h('div', { class: 'grid cols-3' }, group('done'), group('partial'), group('none'))]),
     h(

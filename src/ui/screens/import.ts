@@ -3,7 +3,7 @@ import { KIND_LABELS, RESULT_LABELS } from '../../core/types.ts';
 import { parseCsv } from '../../data/csv.ts';
 import { generateDemo } from '../../data/demo.ts';
 import { activitiesToRows, FIELDS, guessMapping, missingRequired, normalizeRows, sensitiveColumns, type FieldKey, type Mapping } from '../../data/import.ts';
-import { downloadCsv } from '../../data/export.ts';
+import { CAN_DOWNLOAD, downloadCsv } from '../../data/export.ts';
 import { clearImport, demoDataset, readJson, saveImport, writeJson } from '../../data/store.ts';
 import type { Ctx } from '../app.ts';
 import { h } from '../dom.ts';
@@ -111,8 +111,8 @@ export function importScreen(ctx: Ctx): HTMLElement {
             '↺ Вернуться к демо-данным',
           )
         : null,
-      h('button', { class: 'btn', onclick: () => downloadCsv('шаблон_импорта', activitiesToRows(generateDemo({ weeks: 1 }).slice(0, 5))) }, '⤓ Шаблон CSV'),
-      h('button', { class: 'btn', onclick: () => downloadCsv('демо_активности', activitiesToRows(generateDemo())) }, '⤓ Демо целиком (CSV)'),
+      CAN_DOWNLOAD ? h('button', { class: 'btn', onclick: () => downloadCsv('шаблон_импорта', activitiesToRows(generateDemo({ weeks: 1 }).slice(0, 5))) }, '⤓ Шаблон CSV') : null,
+      CAN_DOWNLOAD ? h('button', { class: 'btn', onclick: () => downloadCsv('демо_активности', activitiesToRows(generateDemo())) }, '⤓ Демо целиком (CSV)') : null,
     ),
   ]);
 
@@ -231,6 +231,9 @@ function mappingCard(ctx: Ctx, p: Pending): HTMLElement {
 function schemaCard(): HTMLElement {
   return card('Схема данных', 'одна строка — одна активность', [
     h(
+      'div',
+      { class: 'table-wrap' },
+      h(
       'table',
       { class: 'data' },
       h('thead', null, h('tr', null, h('th', { class: 'l' }, 'Поле'), h('th', { class: 'l' }, 'Обязательно'), h('th', { class: 'l' }, 'Значения'), h('th', { class: 'l' }, 'Узнаём заголовки'))),
@@ -238,6 +241,7 @@ function schemaCard(): HTMLElement {
         'tbody',
         null,
         FIELDS.map((f) => h('tr', null, h('td', { class: 'l' }, f.label), h('td', { class: 'l' }, f.required ? 'да' : 'нет'), h('td', { class: 'l' }, f.hint), h('td', { class: 'l small muted' }, f.synonyms.slice(0, 4).join(', ')))),
+      ),
       ),
     ),
     h('p', { class: 'note' }, 'Если заголовки другие — сопоставьте их вручную после выбора файла; сопоставление запоминается для следующих загрузок.'),

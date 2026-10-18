@@ -8,7 +8,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint .",
-    "demo": "node scripts/generate-demo.ts"
+    "demo": "node scripts/generate-demo.ts",
+    "build:artifact": "vite build --mode artifact && node scripts/inline-artifact.ts"
   },
   "license": "UNLICENSED",
   "devDependencies": {

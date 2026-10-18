@@ -1,7 +1,7 @@
 import { activityOf, conversionOf, weeklySeries } from '../../core/metrics.ts';
 import { lastWeekStarts } from '../../core/periods.ts';
 import { change, METRIC_LABELS, standings, statValue, type ManagerStats, type MetricKey } from '../../core/ranking.ts';
-import { downloadCsv, downloadXlsx, type Cell } from '../../data/export.ts';
+import { CAN_DOWNLOAD, downloadCsv, downloadXlsx, type Cell } from '../../data/export.ts';
 import type { Ctx } from '../app.ts';
 import { sparkline } from '../charts.ts';
 import { h, raw } from '../dom.ts';
@@ -174,8 +174,8 @@ export function rankingScreen(ctx: Ctx): HTMLElement {
     null,
     pageHead('Рейтинг менеджеров', `${stats.length} ${plural(stats.length, 'менеджер', 'менеджера', 'менеджеров')} · ${compareNote(ctx)}`, [
       metricSel,
-      h('button', { class: 'btn', onclick: () => downloadCsv(fname(), exportRows()) }, '⤓ CSV'),
-      h('button', { class: 'btn', onclick: () => void downloadXlsx(fname(), exportRows(), 'Рейтинг') }, '⤓ Excel'),
+      CAN_DOWNLOAD ? h('button', { class: 'btn', onclick: () => downloadCsv(fname(), exportRows()) }, '⤓ CSV') : null,
+      CAN_DOWNLOAD ? h('button', { class: 'btn', onclick: () => void downloadXlsx(fname(), exportRows(), 'Рейтинг') }, '⤓ Excel') : null,
     ]),
     h('section', { class: 'card' }, h('div', { class: 'table-wrap' }, table), h('p', { class: 'note' }, `Место, отклонения и динамика считаются по метрике «${METRIC_LABELS[key]}». Клик по заголовку — сортировка. ▲▼ в столбцах звонков и встреч — к предыдущему такому же периоду.`)),
   );

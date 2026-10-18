@@ -29,3 +29,6 @@ export async function downloadXlsx(name: string, rows: Cell[][], sheet = 'Дан
   const blob = await writeXlsxFile(data, { sheet, columns: rows[0]?.map((_, i) => ({ width: i === 0 ? 24 : 14 })) }).toBlob();
   download(blob, `${name}.xlsx`);
 }
+
+/** В просмотрщике артефактов скачивание файлов заблокировано — кнопки экспорта там не показываем. */
+export const CAN_DOWNLOAD = import.meta.env.MODE !== 'artifact';

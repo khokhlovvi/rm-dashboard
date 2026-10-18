@@ -11,3 +11,4 @@ data/private/*
 *.local.csv
 *.local.xlsx
 data/sample/demo.csv
+dist-artifact/
