@@ -524,6 +524,14 @@ table.heat td.zero {
 table.heat td.dark {
   color: #fff;
 }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) table.heat td.dark {
+    color: #0b0b0b;
+  }
+}
+:root[data-theme='dark'] table.heat td.dark {
+  color: #0b0b0b;
+}
 .heat-legend {
   display: flex;
   align-items: center;
@@ -732,9 +740,9 @@ table.plan td.cell.current {
 }
 .signal {
   display: grid;
-  grid-template-columns: 26px 220px 180px 1fr;
+  grid-template-columns: 26px 240px 1fr;
   gap: 10px;
-  align-items: center;
+  align-items: start;
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -748,6 +756,23 @@ table.plan td.cell.current {
   color: var(--bad-text);
 }
 .signal.medium .ico {
+  color: var(--warn-text);
+}
+.sig-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+}
+.sig-ico {
+  display: inline-block;
+  width: 18px;
+}
+.sig-ico.high {
+  color: var(--bad-text);
+}
+.sig-ico.medium {
   color: var(--warn-text);
 }
 .chips {

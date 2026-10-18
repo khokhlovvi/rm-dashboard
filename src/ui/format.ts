@@ -28,7 +28,7 @@ export function deltaEl(ch: number | null, opts: { suffix?: string; abs?: boolea
 }
 
 export const STATUS_LABEL: Record<PlanStatus, string> = { done: 'выполнен', partial: 'частично', none: 'не начат' };
-export const STATUS_ICON: Record<PlanStatus, string> = { done: '✓', partial: '◐', none: '✕' };
+export const STATUS_ICON: Record<PlanStatus, string> = { done: '✓', partial: '≈', none: '✕' };
 
 export function statusEl(s: PlanStatus, text?: string): HTMLElement {
   return h('span', { class: `status ${s}` }, `${STATUS_ICON[s]} ${text ?? STATUS_LABEL[s]}`);

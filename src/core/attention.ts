@@ -2,7 +2,7 @@ import { activityOf, type Cube } from './metrics.ts';
 import { diffDays, getPeriod, periodLength, type Period } from './periods.ts';
 import type { ManagerStats } from './ranking.ts';
 
-export type SignalKind = 'drop' | 'low' | 'noMeetings' | 'planNone';
+export type SignalKind = 'drop' | 'meetDrop' | 'low' | 'noMeetings' | 'planNone';
 
 export interface Signal {
   manager: string;
@@ -15,6 +15,7 @@ export interface Signal {
 
 export const SIGNAL_LABELS: Record<SignalKind, string> = {
   drop: 'Падение активности',
+  meetDrop: 'Встреч стало меньше',
   low: 'Ниже порога',
   noMeetings: 'Нет встреч',
   planNone: 'План не начат',
@@ -23,8 +24,9 @@ export const SIGNAL_LABELS: Record<SignalKind, string> = {
 /**
  * Сигналы «Внимание»:
  *  - drop: активность (звонки + встречи) упала на dropPct% и больше к предыдущему периоду (база ≥ dropMinBase);
+ *  - meetDrop: встречи упали на dropPct% и больше (база ≥ 3 встреч), даже если звонки держат общую активность;
  *  - low: активность ниже minWeeklyActivity в неделю (для длинного периода — в среднем за неделю);
- *  - noMeetings: нет встреч noMeetingDays дней и больше к опорной дате;
+ *  - noMeetings: нет встреч noMeetingDays дней и больше к опорной дате или 0 встреч за период от недели;
  *  - planNone: план 3 + 6 прошлой недели не начат.
  */
 export function attentionSignals(cube: Cube, stats: ManagerStats[], period: Period, ref: string): Signal[] {
@@ -48,6 +50,19 @@ export function attentionSignals(cube: Cube, stats: ManagerStats[], period: Peri
         });
       }
     }
+    if (m.prev.meetings >= 3) {
+      const ch = (m.agg.meetings - m.prev.meetings) / m.prev.meetings;
+      if (ch <= -s.dropPct / 100 && !out.some((x) => x.index === m.index && x.kind === 'drop')) {
+        out.push({
+          manager: m.name,
+          index: m.index,
+          kind: 'meetDrop',
+          severity: ch <= -0.5 ? 'high' : 'medium',
+          value: ch,
+          text: `Встреч ${m.agg.meetings} против ${m.prev.meetings} в предыдущем периоде (${Math.round(ch * 100)}%)`,
+        });
+      }
+    }
     const perWeek = cur / weeks;
     if (perWeek < s.minWeeklyActivity) {
       out.push({
@@ -61,14 +76,15 @@ export function attentionSignals(cube: Cube, stats: ManagerStats[], period: Peri
     }
     const last = cube.lastMeetingDate(m.index, ref);
     const days = last === null ? Infinity : diffDays(ref, last);
-    if (days >= s.noMeetingDays) {
+    const noneInPeriod = periodLength(period) >= 7 && m.agg.meetings === 0;
+    if (days >= s.noMeetingDays || noneInPeriod) {
       out.push({
         manager: m.name,
         index: m.index,
         kind: 'noMeetings',
-        severity: days >= s.noMeetingDays * 2 ? 'high' : 'medium',
+        severity: days >= s.noMeetingDays * 2 || (noneInPeriod && days >= s.noMeetingDays) ? 'high' : 'medium',
         value: days,
-        text: last === null ? 'Встреч в данных нет' : `Последняя встреча ${days} дн. назад`,
+        text: [noneInPeriod ? '0 встреч за период' : '', last === null ? 'встреч в данных нет' : `последняя встреча ${days} дн. назад`].filter(Boolean).join('; ').replace(/^./, (c) => c.toUpperCase()),
       });
     }
     const lw = cube.sum(m.index, lastWeek.start, lastWeek.end);
