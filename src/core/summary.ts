@@ -46,7 +46,7 @@ export function weeklySummary(cube: Cube, ref: string): string[] {
   if (!up.length && !down.length) out.push('Резких изменений активности у менеджеров нет (в пределах ±15%).');
 
   const conv = stats
-    .filter((m) => m.agg.calls >= 5)
+    .filter((m) => m.agg.calls >= 10)
     .map((m) => ({ name: m.name, c: conversionOf(m.agg) ?? 0 }))
     .sort((a, b) => b.c - a.c)[0];
   const rare = rareProducts(cube, team).slice(0, 3);
