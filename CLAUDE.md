@@ -25,7 +25,9 @@ data/private/  реальные выгрузки — в .gitignore
 - `npm test` — Vitest (однократно)
 - `npm run build` — `tsc --noEmit` + `vite build`
 - `npm run lint` — ESLint
-- `npm run demo` — записать демо-данные в `data/sample/demo.csv`
+- `npm run demo` — записать демо-данные в `data/sample/demo.csv` (файл в .gitignore; в git — только `sample-import.csv`)
+
+Node.js 22.18+ (type stripping для `scripts/*.ts`).
 
 Перед коммитом: `npm test && npm run build && npm run lint`.
 
@@ -38,3 +40,6 @@ data/private/  реальные выгрузки — в .gitignore
 - Цвет не единственный носитель смысла: всегда стрелка ▲▼ и/или подпись.
 - Новые решения записывать в README → «Решения». Держать этот файл актуальным.
 - Коммитить по шагам, сообщения на русском.
+- Новый экран: функция `(ctx: Ctx) => HTMLElement` в `src/ui/screens/`, маршрут — в `src/main.ts`.
+- В исходниках не писать литерал BOM/невидимые символы — только экранирование `\uFEFF` (ESLint `no-irregular-whitespace`).
+- Проверка в браузере: Playwright с Chromium из `/opt/pw-browsers` (в облачной среде), ширина 1440 и 1920, без ошибок консоли и горизонтального скролла.

@@ -1,5 +1,5 @@
 import { isFollowup, isStrategic } from './classify.ts';
-import { addDays, diffDays, fromDay, planWeeks, toDay, weekStart, workdays, monthBounds, type PlanWeek } from './periods.ts';
+import { addDays, fromDay, planWeeks, toDay, weekStart, workdays, monthBounds, type PlanWeek } from './periods.ts';
 import type { Settings } from './settings.ts';
 import { PRODUCTS, type Activity } from './types.ts';
 
@@ -311,8 +311,4 @@ export function rareProducts(cube: Cube, team: Agg, share = 0.03): { product: st
     .map((product, i) => ({ product, count: team.products[i], share: team.products[i] / total }))
     .filter((p) => p.share < share)
     .sort((x, y) => x.count - y.count);
-}
-
-export function daysBetween(a: string, b: string): number {
-  return diffDays(a, b);
 }

@@ -165,7 +165,9 @@ export class App {
     const ctx = this.context(route);
     const y = window.scrollY;
     const key = hash;
-    this.root.replaceChildren(this.topbar(ctx), this.nav(ctx, r), h('main', { class: 'page' }, r.screen(ctx)));
+    const filters = [this.ui.department, this.ui.manager, this.ui.product].filter(Boolean).join(' · ');
+    const printHead = h('div', { class: 'print-only small' }, `Активность клиентских менеджеров · ${periodTitle(ctx.period)}${filters ? ` · фильтр: ${filters}` : ''} · данные: ${ctx.ds.label} · напечатано ${new Date().toLocaleDateString('ru-RU')}`);
+    this.root.replaceChildren(this.topbar(ctx), this.nav(ctx, r), h('main', { class: 'page' }, printHead, r.screen(ctx)));
     document.title = `${r.title} — Активность РМ`;
     // при смене фильтров остаёмся на месте, при переходе — наверх
     window.scrollTo(0, key === this.scrollKey ? y : 0);
