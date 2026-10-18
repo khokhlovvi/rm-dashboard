@@ -10,3 +10,4 @@ data/private/*
 !data/private/README.md
 *.local.csv
 *.local.xlsx
+data/sample/demo.csv
