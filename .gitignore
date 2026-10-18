@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+.env
+.env.*
+# Реальные выгрузки из CRM/мониторинга кладём только сюда, в git не попадают
+data/private/*
+!data/private/README.md
+*.local.csv
+*.local.xlsx
