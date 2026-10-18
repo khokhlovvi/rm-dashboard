@@ -222,7 +222,10 @@ export interface PlanSummary {
 }
 
 export function planSummary(cube: Cube, mi: number, range: { start: string; end: string }, ref: string): PlanSummary {
-  const weeks = planWeeks(range, ref).map((w) => weekPlan(cube, mi, w));
+  // недели, закончившиеся до начала данных, не учитываем: по ним нет информации
+  const weeks = planWeeks(range, ref)
+    .filter((w) => w.end >= cube.minDate)
+    .map((w) => weekPlan(cube, mi, w));
   const complete = weeks.filter((w) => w.week.complete);
   const basis = complete.length ? complete : weeks;
   return {

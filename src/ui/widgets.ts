@@ -17,6 +17,7 @@ export function managerLink(name: string): HTMLElement {
 }
 
 export function compareNote(ctx: Ctx): string {
+  if (ctx.prev.end < ctx.base.minDate) return `сравнение с ${formatRange(ctx.prev)} — данных за этот период нет`;
   return `сравнение с ${formatRange(ctx.prev)}`;
 }
 
@@ -25,7 +26,7 @@ export function chartWeeks(ctx: Ctx): { starts: string[]; highlight: [number, nu
   const p: Period = ctx.period;
   const span = Math.ceil((toDay(weekStart(p.end)) - toDay(weekStart(p.start))) / 7) + 1;
   const n = Math.min(53, Math.max(13, span));
-  const starts = lastWeekStarts(p.end, n).filter((s) => addDays(s, 6) >= ctx.cube.minDate || s >= weekStart(p.start));
+  const starts = lastWeekStarts(p.end, n).filter((s) => addDays(s, 6) >= ctx.base.minDate);
   const first = starts.findIndex((s) => addDays(s, 6) >= p.start);
   return { starts, highlight: [Math.max(0, first), starts.length - 1] };
 }

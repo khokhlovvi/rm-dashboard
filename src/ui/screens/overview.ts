@@ -21,12 +21,13 @@ export function overviewScreen(ctx: Ctx): HTMLElement {
   const active = ctx.stats.filter((m) => activityOf(m.agg) > 0).length;
   const activePrev = ctx.stats.filter((m) => activityOf(m.prev) > 0).length;
   const n = cube.managers.length;
+  const was = (v: number) => (ctx.prev.end < ctx.base.minDate ? 'нет данных за прошлый период' : `было ${fmtInt(v)}`);
 
   const kpis = h(
     'div',
     { class: 'grid cols-4' },
-    kpi('Звонки', fmtInt(team.calls), deltaEl(change(team.calls, teamPrev.calls)), `было ${fmtInt(teamPrev.calls)} · отказов ${fmtInt(team.callRefusal)}`),
-    kpi('Встречи', fmtInt(team.meetings), deltaEl(change(team.meetings, teamPrev.meetings)), `было ${fmtInt(teamPrev.meetings)} · стратегических ${fmtInt(team.strategic)}`),
+    kpi('Звонки', fmtInt(team.calls), deltaEl(change(team.calls, teamPrev.calls)), `${was(teamPrev.calls)} · отказов ${fmtInt(team.callRefusal)}`),
+    kpi('Встречи', fmtInt(team.meetings), deltaEl(change(team.meetings, teamPrev.meetings)), `${was(teamPrev.meetings)} · стратегических ${fmtInt(team.strategic)}`),
     kpi(
       'Конверсия звонок → встреча',
       fmtPct(conv, 1),

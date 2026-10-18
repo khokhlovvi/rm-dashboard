@@ -153,3 +153,23 @@ describe('демо-данные', () => {
     expect(pf.month.forecast).toBeGreaterThan(pf.month.fact);
   });
 });
+
+describe('сигналы внимания: правила', () => {
+  const ref = '2026-10-14';
+  const p = getPeriod('lastWeek', ref); // 05.10–11.10
+  const mk = (date: string, type: Activity['type'], n: number) => Array.from({ length: n }, () => act({ date, type }));
+  it('падение встреч при ровной активности и 0 встреч за период', () => {
+    const list = [...mk('2026-09-29', 'meeting', 4), ...mk('2026-09-29', 'call', 6), ...mk('2026-10-06', 'call', 10), ...mk('2026-10-13', 'meeting', 1)];
+    const cube = new Cube(list, DEFAULT_SETTINGS);
+    const sig = attentionSignals(cube, computeStats(cube, p, previousPeriod(p), ref), p, ref);
+    expect(sig.map((s) => s.kind).sort()).toEqual(['meetDrop', 'noMeetings', 'planNone']);
+  });
+  it('нет встреч N дней к опорной дате', () => {
+    const list = [...mk('2026-09-20', 'meeting', 1), ...mk('2026-10-06', 'call', 12)];
+    const cube = new Cube(list, DEFAULT_SETTINGS);
+    const sig = attentionSignals(cube, computeStats(cube, p, previousPeriod(p), ref), p, ref);
+    const nm = sig.find((s) => s.kind === 'noMeetings');
+    expect(nm?.value).toBe(24);
+    expect(nm?.severity).toBe('high');
+  });
+});

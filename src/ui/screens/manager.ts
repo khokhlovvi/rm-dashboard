@@ -180,8 +180,8 @@ export function managerScreen(ctx: Ctx): HTMLElement {
         missing.length ? h('p', { class: 'note' }, `Не упоминал(а): ${missing.join(', ')}.`) : null,
       ]),
       card('План и факт', `норматив ${ctx.settings.callsPerWeek} звонков и ${ctx.settings.meetingsPerWeek} встреч в неделю`, [
-        progress('Звонки, неделя', pfc.week.fact, pfc.week.plan, pfc.week.forecast === null ? null : Math.round(pfc.week.forecast)),
-        progress('Встречи, неделя', pfm.week.fact, pfm.week.plan, pfm.week.forecast === null ? null : Math.round(pfm.week.forecast)),
+        progress('Звонки, текущая неделя', pfc.week.fact, pfc.week.plan, pfc.week.forecast === null ? null : Math.round(pfc.week.forecast)),
+        progress('Встречи, текущая неделя', pfm.week.fact, pfm.week.plan, pfm.week.forecast === null ? null : Math.round(pfm.week.forecast)),
         progress('Звонки, месяц', pfc.month.fact, pfc.month.plan, pfc.month.forecast),
         progress('Встречи, месяц', pfm.month.fact, pfm.month.plan, pfm.month.forecast),
         h('p', { class: 'note' }, `Всего активностей за период: ${fmtInt(activityOf(a))}.`),
